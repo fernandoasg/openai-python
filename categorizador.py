@@ -7,27 +7,44 @@ load_dotenv()
 client = OpenAI(
   api_key=os.getenv("OPENAI_API_KEY")
 )
+model="gpt-5-mini"
+
+system_prompt = """"
+Você é um categorizador de produtos.
+Você deve assumir as categorias presentes na lista abaixo.
+
+# Lista de Catagorias Válidas
+- Moda Sustentável
+- Produtos para o Lar
+- Beleza Natural
+- Eletrônicos Verdes
+
+# Formato da Saída
+Produto: Nome do Produto
+Categoria: apresente a categoria do produto
+
+# Exemplo de Saída
+Produto: Escova elétrica com recarga solar
+Categoria: Eletrônicos Verdes
+"""
+
+user_prompt = input("Apresente o nome de um produto: ")
+
 
 response = client.chat.completions.create(
-  model="gpt-5",
+  model=model,
   messages=[
     {
         "role": "system",
-        "content": """
-        Classifique o produto abaixo em uma das categorias: Higiene Pessoal, Moda ou Case e de uma descrição da categoria.
-        """
+        "content": system_prompt
     },
     {
         "role": "user",
-        "content": """
-        Escova de dentes de bambu
-        """
+        "content": user_prompt
     }
   ],
   temperature = 0,
-  max_tokens = 200,
-  n = 3
+  max_tokens = 200
 )
 
-for contador in range(0, 3):
-    print(response.choices[contador].message.content)
+print(response.choices[0].message.content)
