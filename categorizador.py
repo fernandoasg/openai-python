@@ -7,7 +7,7 @@ load_dotenv()
 client = OpenAI(
   api_key=os.getenv("OPENAI_API_KEY")
 )
-model="gpt-4.1"
+model="gpt-4"
 
 def categoriza_produto(nome_produto, lista_categorias_possiveis):
   system_prompt = f""""
