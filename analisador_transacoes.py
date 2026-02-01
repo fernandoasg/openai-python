@@ -78,5 +78,46 @@ def analisar_transacao(lista_transacoes):
     print("\nJSON:", json_resultado)
     return json_resultado
 
+
+def gerar_parecer(transacao):
+    print("2. Gerando parecer para transacao ", transacao["id"])
+    prompt_sistema = f"""
+    Para a seguinte transação, forneça um parecer, apenas se o status dela for de "Possível Fraude". Indique no parecer uma justificativa para que você identifique uma fraude.
+    Transação: {transacao}
+
+    ## Formato de Resposta
+    "id": "id",
+    "tipo": "crédito ou débito",
+    "estabelecimento": "nome do estabelecimento",
+    "horario": "horário da transação",
+    "valor": "R$XX,XX",
+    "nome_produto": "nome do produto",
+    "localizacao": "cidade - estado (País)"
+    "status": "",
+    "parecer" : "Colocar Não Aplicável se o status for Aprovado"
+    """
+    lista_mensagens = [
+        {
+            "role": "system",
+            "content": prompt_sistema
+        }
+    ]
+
+    resposta = client.chat.completions.create(
+        messages = lista_mensagens,
+        model=modelo,
+    )
+
+    conteudo = resposta.choices[0].message.content
+    print("Finalizou a geração de parecer")
+    
+    return conteudo
+
+
 lista_de_transacoes = carrega("./dados/transacoes.csv")
-analisar_transacao(lista_de_transacoes)
+transacoes_analisadas = analisar_transacao(lista_de_transacoes)
+
+for transacao in transacoes_analisadas["transacoes"]:
+    if transacao["status"] == "Possível Fraude":
+        parecer = gerar_parecer(transacao)
+        print(parecer)
